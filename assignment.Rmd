@@ -1,0 +1,99 @@
+---
+title: "Machine Learning Assignment"
+author: "Nina"
+date: "Saturday, March 14, 2015"
+output: html_document
+keep_md: yes
+---
+### Synopsis
+Six young health participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).The goal of this project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. 
+
+
+### Load data
+```{r}
+library(caret)
+Data<-read.csv("pml-training.csv")
+testdata<-read.csv("pml-testing.csv")
+
+```
+### Data Slicing 
+
+Create training (75%) and test (25%) sets
+
+```{r}
+set.seed(1984)
+DataN<-Data[Data$new_window=="yes",]
+inTrain<-createDataPartition(DataN$classe, p = 0.75, list = FALSE)
+training<-DataN[inTrain, ]
+testing<-DataN[-inTrain, ]
+```
+### Data Preprocessing 
+
+Remove irrelevant variables for model training.
+```{r}
+train_clean<-training[,-grep("avg|kurtosis|skewness|max|min|var|stddev|amplitude",colnames(training))]
+tr_cleaner<-train_clean[,-(1:7)]
+
+test_clean<-testing[,-grep("avg|kurtosis|skewness|max|min|var|stddev|amplitude",colnames(testing))]
+tt_cleaner<-test_clean[,-(1:7)]
+
+```
+
+### Training 
+
+#### Model 1 Random forests
+```{r}
+cvCtrl <- trainControl(method = "repeatedcv", repeats = 3, allowParallel = TRUE)
+Model1<-train(tr_cleaner$classe~ . , method= "rf", data=tr_cleaner, trControl =cvCtrl)
+confusionMatrix(tr_cleaner$classe, predict(Model1, tr_cleaner))$overall
+```
+
+#### Model 2  Boosting with trees
+```{r results='hide'}
+cvCtrl <- trainControl(method = "repeatedcv", repeats = 3, allowParallel = TRUE)
+Model2<-train(tr_cleaner$classe~ . , method= "gbm", data=tr_cleaner, trControl =cvCtrl)
+```
+```{r}
+confusionMatrix(tr_cleaner$classe, predict(Model2, tr_cleaner))$overall
+
+```
+
+We can see both models have decent in sample performance. The **in sample accuracy of both Model 1 and Model 2 are 1**. 
+We will do cross validation on the test set to estimate the out of sample error in the following section.
+
+
+### Cross Validation and Model Selection
+
+#### Model 1 Random forests
+```{r echo=FALSE}
+
+Accu1<-confusionMatrix(tt_cleaner$classe, predict(Model1, tt_cleaner))$overall[[1]]
+err1<-1-Accu1
+```
+According to the results of cross validation, the **accuracy of Model 1 is** `r Accu1` and the **expected out of sample error is** `r err1`.
+
+```{r}
+
+confusionMatrix(tt_cleaner$classe, predict(Model1, tt_cleaner))$overall
+
+```
+
+#### Model 2  Boosting with trees
+
+```{r echo=FALSE}
+
+Accu2<-confusionMatrix(tt_cleaner$classe, predict(Model2, tt_cleaner))$overall[[1]]
+err2<-1-Accu2
+```
+According to the results of cross validation, the **accuracy of Model 2 is** `r Accu2` and the **expected out of sample error is** `r err2`.
+
+```{r}
+
+confusionMatrix(tt_cleaner$classe, predict(Model2, tt_cleaner))$overall
+```
+
+#### Selection
+
+Because the out of sample accuracy of Model 1 is higher than Model 2, I will select **Model 1 (random forests)** to perform the predict the 20 test cases. 
+
+
