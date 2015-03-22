@@ -21,7 +21,7 @@ testdata<-read.csv("pml-testing.csv")
 Create training (75%) and test (25%) sets
 
 ```{r}
-set.seed(1984)
+set.seed(1983)
 DataN<-Data[Data$new_window=="yes",]
 inTrain<-createDataPartition(DataN$classe, p = 0.75, list = FALSE)
 training<-DataN[inTrain, ]

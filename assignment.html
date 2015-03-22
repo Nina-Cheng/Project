@@ -74,7 +74,7 @@ testdata&lt;-read.csv(&quot;pml-testing.csv&quot;)</code></pre>
 <div id="data-slicing" class="section level3">
 <h3>Data Slicing</h3>
 <p>Create training (75%) and test (25%) sets</p>
-<pre class="r"><code>set.seed(1984)
+<pre class="r"><code>set.seed(1985)
 DataN&lt;-Data[Data$new_window==&quot;yes&quot;,]
 inTrain&lt;-createDataPartition(DataN$classe, p = 0.75, list = FALSE)
 training&lt;-DataN[inTrain, ]
@@ -135,21 +135,21 @@ Model2&lt;-train(tr_cleaner$classe~ . , method= &quot;gbm&quot;, data=tr_cleaner
 <h3>Cross Validation and Model Selection</h3>
 <div id="model-1-random-forests-1" class="section level4">
 <h4>Model 1 Random forests</h4>
-<p>According to the results of cross validation, the <strong>accuracy of Model 1 is</strong> 0.7777778 and the <strong>expected out of sample error is</strong> 0.2222222.</p>
+<p>According to the results of cross validation, the <strong>accuracy of Model 1 is</strong> 0.7373737 and the <strong>expected out of sample error is</strong> 0.2626263.</p>
 <pre class="r"><code>confusionMatrix(tt_cleaner$classe, predict(Model1, tt_cleaner))$overall</code></pre>
 <pre><code>##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##   7.777778e-01   7.216969e-01   6.831092e-01   8.551881e-01   2.424242e-01 
+##   7.373737e-01   6.696612e-01   6.393278e-01   8.207276e-01   2.525253e-01 
 ## AccuracyPValue  McnemarPValue 
-##   5.726494e-29            NaN</code></pre>
+##   7.084459e-24            NaN</code></pre>
 </div>
 <div id="model-2-boosting-with-trees-1" class="section level4">
 <h4>Model 2 Boosting with trees</h4>
-<p>According to the results of cross validation, the <strong>accuracy of Model 2 is</strong> 0.7676768 and the <strong>expected out of sample error is</strong> 0.2323232.</p>
+<p>According to the results of cross validation, the <strong>accuracy of Model 2 is</strong> 0.7373737 and the <strong>expected out of sample error is</strong> 0.2626263.</p>
 <pre class="r"><code>confusionMatrix(tt_cleaner$classe, predict(Model2, tt_cleaner))$overall</code></pre>
 <pre><code>##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##   7.676768e-01   7.086745e-01   6.720715e-01   8.466691e-01   2.424242e-01 
+##   7.373737e-01   6.708440e-01   6.393278e-01   8.207276e-01   2.323232e-01 
 ## AccuracyPValue  McnemarPValue 
-##   6.025996e-28            NaN</code></pre>
+##   3.176726e-26            NaN</code></pre>
 </div>
 <div id="selection" class="section level4">
 <h4>Selection</h4>
